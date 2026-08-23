@@ -4,6 +4,8 @@ bin/
 obj/
 dist/
 build/
+backend/nueces-backend
+backend/nueces-backend.exe
 
 # secretos: NUNCA se versionan
 .env
@@ -14,3 +16,5 @@ build/
 Thumbs.db
 .vscode/
 .idea/
+
+.atl/

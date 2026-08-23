@@ -1,0 +1,69 @@
+/* Fuentes de marca — Google Fonts.
+   Caveat: títulos/hero (manuscrita, evoca el "nueces" del logo).
+   Nunito: todo lo demás (texto, botones, precios, formularios). */
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap');
+
+@import 'tailwindcss';
+
+@theme {
+  /* Rampa "primary" (lima verde) anclada en primary-500 ≈ #D5E022,
+     tomado por muestreo de píxeles del logo. */
+  --color-primary-50: #fafbef;
+  --color-primary-100: #f5f7d9;
+  --color-primary-200: #eef2b5;
+  --color-primary-300: #e8ee8c;
+  --color-primary-400: #e0e859;
+  --color-primary-500: #d5e022;
+  --color-primary-600: #adb620;
+  --color-primary-700: #888f1e;
+  --color-primary-800: #696e1c;
+  --color-primary-900: #4c4f17;
+
+  /* Rampa "secondary" (marrón canela / tinta), aclarada a pedido en dos
+     pasadas respecto al marrón del logo (#623714): mismo matiz, bastante
+     menos saturación y luminosidad más alta en toda la escala para que
+     ni el ancla (500) ni los tonos "ink" (700-900) lean oscuros. */
+  --color-secondary-50: #f9f4f1;
+  --color-secondary-100: #f1e7df;
+  --color-secondary-200: #e3cfbf;
+  --color-secondary-300: #d4b296;
+  --color-secondary-400: #c4956e;
+  --color-secondary-500: #b37a4d;
+  --color-secondary-600: #906541;
+  --color-secondary-700: #725136;
+  --color-secondary-800: #59402c;
+  --color-secondary-900: #402f21;
+
+  --font-heading: 'Caveat', cursive;
+  --font-sans: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Tailwind's preflight ya resetea box-sizing y márgenes; sólo dejamos
+   acá los globales que no son utilidades: fondo/color base y fuente.
+   Van dentro de @layer base para que sigan participando del orden de
+   capas de Tailwind — así una utility class como font-sans en un h1/h2
+   puntual puede seguir pisando esta regla (CSS sin capa le gana a
+   cualquier @layer sin importar especificidad, así que sin esto un
+   font-sans en un h1 no alcanzaba a ganarle a esta regla). */
+@layer base {
+  body {
+    background-color: var(--color-primary-50);
+    color: var(--color-secondary-800);
+    font-family: var(--font-sans);
+  }
+
+  h1,
+  h2 {
+    font-family: var(--font-heading);
+  }
+}
+
+/* react-alice-carousel: recolorear los dots de navegación con la marca. */
+.featured-carousel .alice-carousel__dots-item:not(.__custom) {
+  background-color: var(--color-secondary-200);
+}
+
+.featured-carousel .alice-carousel__dots-item:not(.__custom):hover,
+.featured-carousel .alice-carousel__dots-item:not(.__custom).__active {
+  background-color: var(--color-primary-500);
+}
