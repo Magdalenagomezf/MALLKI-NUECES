@@ -1,4 +1,5 @@
 # Mallki — ecommerce mayorista de nueces
+[![CI](https://github.com/Magdalenagomezf/ingsoft3-tp01/actions/workflows/ci.yml/badge.svg)](https://github.com/Magdalenagomezf/ingsoft3-tp01/actions/workflows/ci.yml)
 
 Catálogo, armado de pedidos y listado de pedidos para el emprendimiento de nueces de mi papá.
 Backend en Go, frontend en React + Vite, PostgreSQL como base de datos — todo corre en contenedores.
