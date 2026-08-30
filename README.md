@@ -53,3 +53,4 @@ docker compose down -v     # apaga y borra también los datos (el volumen)
 - **Frontend**: React + Vite + Tailwind, servido por nginx en producción
 - **Base de datos**: PostgreSQL 16
 - **Contenedores**: Dockerfiles multi-stage para backend y frontend, orquestados con Docker Compose
+
