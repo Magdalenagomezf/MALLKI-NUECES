@@ -97,7 +97,9 @@ export function Pedidos() {
                 <p className="mt-1 text-secondary-700">
                   <strong>{pedido.cliente_nombre}</strong> — {pedido.cliente_contacto}
                 </p>
-                <p className="mt-0.5 text-sm text-secondary-500">{formatearFecha(pedido.fecha_creacion)}</p>
+                <p className="mt-0.5 text-sm text-secondary-500">
+                  {formatearFecha(pedido.fecha_creacion)} · Pago: {pedido.metodo_pago}
+                </p>
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full border-collapse text-sm">
                     <thead>

@@ -50,6 +50,9 @@ func (s *Service) Create(input PedidoInput) (Pedido, error) {
 	if input.ClienteContacto == "" {
 		return Pedido{}, badRequest("cliente_contacto es requerido")
 	}
+	if input.MetodoPago != "transferencia" && input.MetodoPago != "efectivo" {
+		return Pedido{}, badRequest("metodo_pago debe ser 'transferencia' o 'efectivo'")
+	}
 	if len(input.Items) == 0 {
 		return Pedido{}, badRequest("el pedido debe tener al menos un item")
 	}
@@ -102,7 +105,7 @@ func (s *Service) Create(input PedidoInput) (Pedido, error) {
 		}
 	}
 
-	pedido, err := s.repo.InsertPedido(tx, input.ClienteNombre, input.ClienteContacto)
+	pedido, err := s.repo.InsertPedido(tx, input.ClienteNombre, input.ClienteContacto, input.MetodoPago)
 	if err != nil {
 		return Pedido{}, internalError("error creando pedido")
 	}

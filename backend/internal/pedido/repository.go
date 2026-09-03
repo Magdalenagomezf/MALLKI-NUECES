@@ -13,14 +13,14 @@ func NewRepository(db *sql.DB) *Repository {
 }
 
 // InsertPedido creates the pedidos row inside an existing transaction and
-// returns it with its generated id, fecha_creacion and estado.
-func (r *Repository) InsertPedido(tx *sql.Tx, clienteNombre, clienteContacto string) (Pedido, error) {
+// returns it with its generated id, fecha_creacion y estado.
+func (r *Repository) InsertPedido(tx *sql.Tx, clienteNombre, clienteContacto, metodoPago string) (Pedido, error) {
 	var p Pedido
 	err := tx.QueryRow(
-		`INSERT INTO pedidos (cliente_nombre, cliente_contacto) VALUES ($1, $2)
-		 RETURNING id, cliente_nombre, cliente_contacto, fecha_creacion, estado`,
-		clienteNombre, clienteContacto,
-	).Scan(&p.ID, &p.ClienteNombre, &p.ClienteContacto, &p.FechaCreacion, &p.Estado)
+		`INSERT INTO pedidos (cliente_nombre, cliente_contacto, metodo_pago) VALUES ($1, $2, $3)
+		 RETURNING id, cliente_nombre, cliente_contacto, fecha_creacion, estado, metodo_pago`,
+		clienteNombre, clienteContacto, metodoPago,
+	).Scan(&p.ID, &p.ClienteNombre, &p.ClienteContacto, &p.FechaCreacion, &p.Estado, &p.MetodoPago)
 	return p, err
 }
 
@@ -40,7 +40,7 @@ func (r *Repository) InsertItem(tx *sql.Tx, pedidoID, productoID int, cantidadKg
 // name for display. This is a read-model concern (presenting pedido data),
 // not a write concern, so it legitimately joins against productos here.
 func (r *Repository) List() ([]Pedido, error) {
-	rows, err := r.db.Query(`SELECT id, cliente_nombre, cliente_contacto, fecha_creacion, estado FROM pedidos ORDER BY id`)
+	rows, err := r.db.Query(`SELECT id, cliente_nombre, cliente_contacto, fecha_creacion, estado, metodo_pago FROM pedidos ORDER BY id`)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +50,7 @@ func (r *Repository) List() ([]Pedido, error) {
 	var order []int
 	for rows.Next() {
 		var p Pedido
-		if err := rows.Scan(&p.ID, &p.ClienteNombre, &p.ClienteContacto, &p.FechaCreacion, &p.Estado); err != nil {
+		if err := rows.Scan(&p.ID, &p.ClienteNombre, &p.ClienteContacto, &p.FechaCreacion, &p.Estado, &p.MetodoPago); err != nil {
 			rows.Close()
 			return nil, err
 		}

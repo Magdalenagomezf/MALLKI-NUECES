@@ -13,6 +13,7 @@ export function ArmarPedido() {
   const [carrito, setCarrito] = useState([]);
   const [clienteNombre, setClienteNombre] = useState('');
   const [clienteContacto, setClienteContacto] = useState('');
+  const [metodoPago, setMetodoPago] = useState('');
   const [enviando, setEnviando] = useState(false);
   const [errorEnvio, setErrorEnvio] = useState(null);
   const [confirmacion, setConfirmacion] = useState(null);
@@ -55,6 +56,7 @@ export function ArmarPedido() {
     const errores = [];
     if (!clienteNombre.trim()) errores.push('El nombre del cliente es requerido.');
     if (!clienteContacto.trim()) errores.push('El contacto del cliente es requerido.');
+    if (!metodoPago) errores.push('Elegí un método de pago.');
     if (carrito.length === 0) errores.push('Agregá al menos un producto al pedido.');
     if (carrito.some((item) => !item.cantidad_kg || item.cantidad_kg <= 0)) {
       errores.push('Todas las cantidades deben ser mayores a 0.');
@@ -76,6 +78,7 @@ export function ArmarPedido() {
       const pedido = await createPedido({
         cliente_nombre: clienteNombre.trim(),
         cliente_contacto: clienteContacto.trim(),
+        metodo_pago: metodoPago,
         items: carrito.map((item) => ({
           producto_id: item.producto_id,
           cantidad_kg: item.cantidad_kg,
@@ -85,6 +88,7 @@ export function ArmarPedido() {
       setCarrito([]);
       setClienteNombre('');
       setClienteContacto('');
+      setMetodoPago('');
       setErroresValidacion([]);
     } catch (err) {
       setErrorEnvio(err.message);
@@ -146,6 +150,31 @@ export function ArmarPedido() {
                 className="rounded-md border border-secondary-200 px-3 py-2 text-base font-normal text-secondary-800 focus:border-primary-500 focus:outline-none"
               />
             </label>
+            <fieldset className="flex flex-col gap-1 text-sm font-semibold text-secondary-700">
+              <legend className="mb-1">Método de pago</legend>
+              <div className="flex gap-4 font-normal text-secondary-800">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="metodoPago"
+                    value="transferencia"
+                    checked={metodoPago === 'transferencia'}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                  />
+                  Transferencia
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="metodoPago"
+                    value="efectivo"
+                    checked={metodoPago === 'efectivo'}
+                    onChange={(e) => setMetodoPago(e.target.value)}
+                  />
+                  Efectivo
+                </label>
+              </div>
+            </fieldset>
 
             {erroresValidacion.length > 0 && (
               <ul className="list-disc rounded-md bg-red-50 px-4 py-3 pl-8 text-red-700">
