@@ -1,5 +1,5 @@
 # Mallki — ecommerce mayorista de nueces
-[![CI](https://github.com/Magdalenagomezf/ingsoft3-tp01/actions/workflows/ci.yml/badge.svg)](https://github.com/Magdalenagomezf/ingsoft3-tp01/actions/workflows/ci.yml)
+[![CI](https://github.com/Magdalenagomezf/MALLKI-NUECES/actions/workflows/ci.yml/badge.svg)](https://github.com/Magdalenagomezf/MALLKI-NUECES/actions/workflows/ci.yml)
 
 Catálogo, armado de pedidos y listado de pedidos para el emprendimiento de nueces de mi papá.
 Backend en Go, frontend en React + Vite, PostgreSQL como base de datos — todo corre en contenedores.
@@ -10,8 +10,8 @@ Requisitos: [Docker Desktop](https://docs.docker.com/get-docker/) instalado y co
 
 1. Cloná el repositorio:
    ```
-   git clone https://github.com/magdalenagomezf/ingsoft3-tp01.git
-   cd ingsoft3-tp01
+   git clone https://github.com/Magdalenagomezf/MALLKI-NUECES.git
+   cd MALLKI-NUECES
    ```
 
 2. Copiá la plantilla de variables de entorno y poné una contraseña:
@@ -32,14 +32,6 @@ Requisitos: [Docker Desktop](https://docs.docker.com/get-docker/) instalado y co
    `db` debe figurar como `healthy`.
 
 5. Abrí `http://localhost:3000` en el navegador.
-
-## Variante: usando las imágenes publicadas (sin compilar)
-
-En vez del paso 3, con el mismo `.env` ya creado:
-```
-docker compose -f docker-compose.registry.yml up -d
-```
-Esto descarga las imágenes ya publicadas en ghcr.io en vez de construirlas localmente.
 
 ## Apagar el sistema
 
