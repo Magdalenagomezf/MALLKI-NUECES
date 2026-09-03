@@ -25,8 +25,22 @@ func badRequest(message string) *Error {
 	return &Error{Status: http.StatusBadRequest, Message: message}
 }
 
+func notFound(message string) *Error {
+	return &Error{Status: http.StatusNotFound, Message: message}
+}
+
 func internalError(message string) *Error {
 	return &Error{Status: http.StatusInternalServerError, Message: message}
+}
+
+// estadosValidos son los únicos valores aceptados para pedidos.estado. Las
+// transiciones son libres a propósito: el admin puede corregir errores
+// poniendo cualquier estado en cualquier momento, sin máquina de estados.
+var estadosValidos = map[string]bool{
+	"pendiente":      true,
+	"confirmado":     true,
+	"en_preparacion": true,
+	"entregado":      true,
 }
 
 type Service struct {
@@ -43,12 +57,30 @@ func (s *Service) List() ([]Pedido, error) {
 	return s.repo.List()
 }
 
+func (s *Service) UpdateEstado(id int, estado string) (Pedido, error) {
+	if !estadosValidos[estado] {
+		return Pedido{}, badRequest("estado debe ser uno de: pendiente, confirmado, en_preparacion, entregado")
+	}
+
+	pedido, err := s.repo.UpdateEstado(id, estado)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Pedido{}, notFound("pedido no encontrado")
+		}
+		return Pedido{}, internalError("error actualizando estado del pedido")
+	}
+	return pedido, nil
+}
+
 func (s *Service) Create(input PedidoInput) (Pedido, error) {
 	if input.ClienteNombre == "" {
 		return Pedido{}, badRequest("cliente_nombre es requerido")
 	}
 	if input.ClienteContacto == "" {
 		return Pedido{}, badRequest("cliente_contacto es requerido")
+	}
+	if input.MetodoPago != "transferencia" && input.MetodoPago != "efectivo" {
+		return Pedido{}, badRequest("metodo_pago debe ser 'transferencia' o 'efectivo'")
 	}
 	if len(input.Items) == 0 {
 		return Pedido{}, badRequest("el pedido debe tener al menos un item")
@@ -102,7 +134,7 @@ func (s *Service) Create(input PedidoInput) (Pedido, error) {
 		}
 	}
 
-	pedido, err := s.repo.InsertPedido(tx, input.ClienteNombre, input.ClienteContacto)
+	pedido, err := s.repo.InsertPedido(tx, input.ClienteNombre, input.ClienteContacto, input.MetodoPago)
 	if err != nil {
 		return Pedido{}, internalError("error creando pedido")
 	}

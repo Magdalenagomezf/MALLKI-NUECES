@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api';
+import { useAuth } from '../auth';
 
 export function Login() {
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuth();
   const [usuario, setUsuario] = useState('');
   const [contrasena, setContrasena] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -15,6 +17,7 @@ export function Login() {
     setEnviando(true);
     try {
       await login(usuario, contrasena);
+      setAuthenticated(true);
       navigate('/pedidos');
     } catch (err) {
       setError(err.message);

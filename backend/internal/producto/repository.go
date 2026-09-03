@@ -79,6 +79,21 @@ func (r *Repository) Delete(id int) (bool, error) {
 	return rowsAffected > 0, nil
 }
 
+// UpdateStock updates a producto's stock_kg and returns the row with its new
+// value. Returns sql.ErrNoRows if no producto with that id exists.
+func (r *Repository) UpdateStock(id int, stockKg float64) (Producto, error) {
+	var p Producto
+	var descripcion, categoria sql.NullString
+	err := r.db.QueryRow(
+		`UPDATE productos SET stock_kg = $1 WHERE id = $2
+		 RETURNING id, nombre, descripcion, categoria, precio_por_kg, stock_kg`,
+		stockKg, id,
+	).Scan(&p.ID, &p.Nombre, &descripcion, &categoria, &p.PrecioPorKg, &p.StockKg)
+	p.Descripcion = descripcion.String
+	p.Categoria = categoria.String
+	return p, err
+}
+
 // producto's stock. Kept here (rather than in pedido's repository) so this
 // file remains the only place with SQL for the productos table, even though
 // it is called from within pedido's order-creation transaction.

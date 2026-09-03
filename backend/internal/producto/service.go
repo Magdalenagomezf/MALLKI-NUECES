@@ -1,6 +1,9 @@
 package producto
 
-import "errors"
+import (
+	"database/sql"
+	"errors"
+)
 
 var (
 	ErrNombreRequerido = errors.New("nombre es requerido")
@@ -57,6 +60,20 @@ func (s *Service) Update(id int, p Producto) (Producto, error) {
 		return Producto{}, ErrNotFound
 	}
 	p.ID = id
+	return p, nil
+}
+
+func (s *Service) UpdateStock(id int, stockKg float64) (Producto, error) {
+	if stockKg < 0 {
+		return Producto{}, ErrStockNegativo
+	}
+	p, err := s.repo.UpdateStock(id, stockKg)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Producto{}, ErrNotFound
+		}
+		return Producto{}, err
+	}
 	return p, nil
 }
 

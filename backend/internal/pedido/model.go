@@ -8,6 +8,7 @@ type Pedido struct {
 	ClienteContacto string       `json:"cliente_contacto"`
 	FechaCreacion   time.Time    `json:"fecha_creacion"`
 	Estado          string       `json:"estado"`
+	MetodoPago      string       `json:"metodo_pago"`
 	Items           []PedidoItem `json:"items"`
 }
 
@@ -28,5 +29,6 @@ type PedidoItemInput struct {
 type PedidoInput struct {
 	ClienteNombre   string            `json:"cliente_nombre"`
 	ClienteContacto string            `json:"cliente_contacto"`
+	MetodoPago      string            `json:"metodo_pago"`
 	Items           []PedidoItemInput `json:"items"`
 }

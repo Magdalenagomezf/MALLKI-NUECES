@@ -68,6 +68,13 @@ export function deleteProducto(id) {
   return request(`/productos/${id}`, { method: 'DELETE' });
 }
 
+export function updateProductoStock(id, stockKg) {
+  return request(`/productos/${id}/stock`, {
+    method: 'PATCH',
+    body: JSON.stringify({ stock_kg: stockKg }),
+  });
+}
+
 // --- Pedidos ---
 
 export function getPedidos() {
@@ -78,6 +85,13 @@ export function createPedido(pedido) {
   return request('/pedidos', {
     method: 'POST',
     body: JSON.stringify(pedido),
+  });
+}
+
+export function updatePedidoEstado(id, estado) {
+  return request(`/pedidos/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado }),
   });
 }
 
@@ -92,4 +106,8 @@ export function login(usuario, contrasena) {
 
 export function logout() {
   return request('/logout', { method: 'POST' });
+}
+
+export function getMe() {
+  return request('/me');
 }

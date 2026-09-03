@@ -91,3 +91,10 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 
 	httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
+
+// Me devuelve 200 si el request trae una sesión válida. La validación de la
+// cookie la hace el middleware requireAuth al envolver este handler (mismo
+// patrón que GET /api/pedidos), así que acá no hace falta leerla.
+func (h *Handler) Me(w http.ResponseWriter, r *http.Request) {
+	httpx.WriteJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}

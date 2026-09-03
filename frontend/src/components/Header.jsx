@@ -1,13 +1,7 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import logoMallki from '../assets/logo-mallki.jpeg';
-
-const LINKS = [
-  { to: '/', label: 'Catálogo' },
-  { to: '/armar-pedido', label: 'Armar pedido' },
-  { to: '/pedidos', label: 'Pedidos' },
-  { to: '/login', label: 'Admin' },
-];
+import { useAuth } from '../auth';
 
 function navLinkClasses({ isActive }) {
   return [
@@ -20,6 +14,19 @@ function navLinkClasses({ isActive }) {
 
 export function Header() {
   const [menuAbierto, setMenuAbierto] = useState(false);
+  const { isAuthenticated } = useAuth();
+
+  const links = [
+    { to: '/', label: 'Catálogo' },
+    { to: '/armar-pedido', label: 'Armar pedido' },
+    ...(isAuthenticated === true
+      ? [
+          { to: '/pedidos', label: 'Pedidos' },
+          { to: '/stock', label: 'Stock' },
+        ]
+      : []),
+    { to: '/login', label: 'Iniciar sesión' },
+  ];
 
   return (
     <header className="sticky top-0 z-20 border-b border-secondary-700 bg-secondary-800 shadow-md">
@@ -34,7 +41,7 @@ export function Header() {
         </div>
 
         <nav className="hidden items-center gap-2 sm:flex">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink key={link.to} to={link.to} end={link.to === '/'} className={navLinkClasses}>
               {link.label}
             </NavLink>
@@ -54,7 +61,7 @@ export function Header() {
 
       {menuAbierto && (
         <nav className="flex flex-col gap-1 border-t border-secondary-700 px-4 pb-3 pt-2 sm:hidden">
-          {LINKS.map((link) => (
+          {links.map((link) => (
             <NavLink
               key={link.to}
               to={link.to}

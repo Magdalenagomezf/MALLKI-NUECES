@@ -25,8 +25,14 @@ CREATE TABLE IF NOT EXISTS pedidos (
 	cliente_nombre TEXT NOT NULL,
 	cliente_contacto TEXT NOT NULL,
 	fecha_creacion TIMESTAMP NOT NULL DEFAULT now(),
-	estado TEXT NOT NULL DEFAULT 'pendiente'
+	estado TEXT NOT NULL DEFAULT 'pendiente',
+	metodo_pago TEXT NOT NULL DEFAULT 'efectivo'
 );
+
+-- CREATE TABLE IF NOT EXISTS es un no-op si la tabla ya existe, asi que una
+-- base ya corriendo (Docker local con pedidos de prueba) no recibe la
+-- columna nueva sin este ALTER TABLE idempotente.
+ALTER TABLE pedidos ADD COLUMN IF NOT EXISTS metodo_pago TEXT NOT NULL DEFAULT 'efectivo';
 
 CREATE TABLE IF NOT EXISTS pedido_items (
 	id SERIAL PRIMARY KEY,
