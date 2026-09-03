@@ -15,6 +15,25 @@ services:
     build: ./backend
     environment:
       DATABASE_URL: "postgres://postgres:${DB_PASSWORD}@db:5432/nueces?sslmode=disable"
+      # Credencial del único usuario admin. ADMIN_PASSWORD_HASH es un hash
+      # bcrypt, nunca la contraseña en texto plano. Para generar uno con el
+      # Go del proyecto (desde backend/, con golang.org/x/crypto ya en
+      # go.mod), guardar esto en un archivo temporal p.ej. hashpw.go:
+      #
+      #   package main
+      #   import ("fmt"; "os"; "golang.org/x/crypto/bcrypt")
+      #   func main() {
+      #       h, _ := bcrypt.GenerateFromPassword([]byte(os.Args[1]), bcrypt.DefaultCost)
+      #       fmt.Println(string(h))
+      #   }
+      #
+      # y correr: go run hashpw.go 'tu-clave' (después borrar el archivo).
+      # Definí ADMIN_USER y ADMIN_PASSWORD_HASH como vars de entorno del host
+      # (o en un .env sin trackear) antes de levantar el compose.
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH}
+      FRONTEND_ORIGIN: "http://localhost:3000"
+      COOKIE_SECURE: "false" # poner "true" en producción (https)
     ports:
       - "8080:8080"
     depends_on:

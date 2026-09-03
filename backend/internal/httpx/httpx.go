@@ -24,3 +24,25 @@ func WriteError(w http.ResponseWriter, status int, message string) {
 func IsNoRows(err error) bool {
 	return err == sql.ErrNoRows
 }
+
+// CORS envuelve un handler agregando los headers de CORS necesarios para que
+// el frontend (en otro puerto) pueda hacer requests con cookies de sesión.
+// El origin permitido es explícito (no "*") porque los requests con
+// credentials no pueden usar wildcard.
+func CORS(allowedOrigin string) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Set("Access-Control-Allow-Origin", allowedOrigin)
+			w.Header().Set("Access-Control-Allow-Credentials", "true")
+			w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+			if r.Method == http.MethodOptions {
+				w.WriteHeader(http.StatusNoContent)
+				return
+			}
+
+			next.ServeHTTP(w, r)
+		})
+	}
+}
