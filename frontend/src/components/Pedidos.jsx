@@ -32,6 +32,22 @@ const ESTADO_BADGE_CLASSES = {
 };
 const ESTADO_BADGE_DEFAULT = 'bg-secondary-100 text-secondary-700';
 
+// Número de WhatsApp del admin (formato internacional, sin "+" ni espacios,
+// con el "9" que WhatsApp requiere para números móviles de Argentina).
+const WHATSAPP_ADMIN = '5493834003867';
+
+function armarMensajeWhatsApp(pedido) {
+  const items = pedido.items
+    .map((item) => `- ${item.producto_nombre}: ${item.cantidad_kg} kg`)
+    .join('\n');
+  return (
+    `Nuevo pedido #${pedido.id}\n` +
+    `Cliente: ${pedido.cliente_nombre} (${pedido.cliente_contacto})\n` +
+    `Pago: ${pedido.metodo_pago}\n\n` +
+    `${items}`
+  );
+}
+
 export function Pedidos() {
   const navigate = useNavigate();
   const { setAuthenticated } = useAuth();
@@ -129,6 +145,14 @@ export function Pedidos() {
                   {formatearFecha(pedido.fecha_creacion)} · Pago: {pedido.metodo_pago}
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <a
+                    href={`https://wa.me/${WHATSAPP_ADMIN}?text=${encodeURIComponent(armarMensajeWhatsApp(pedido))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded-md border border-green-600 px-3 py-1 text-sm font-semibold text-green-700 transition-colors hover:bg-green-50"
+                  >
+                    Avisar por WhatsApp
+                  </a>
                   <label htmlFor={`estado-${pedido.id}`} className="text-sm font-semibold text-secondary-700">
                     Estado:
                   </label>

@@ -14,11 +14,48 @@ _(vacío por ahora)_
 ## Backlog (a priorizar juntos, todavía sin orden ni decisiones)
 
 - **Precios por volumen**: descuento por cantidad, típico de venta mayorista.
-- **Notificación de pedido nuevo por WhatsApp**: más simple y más usado acá que email.
 - **Carga de fotos reales de producto**: panel simple para reemplazar las fotos genéricas
   actuales — depende del panel admin del login.
 
 ## Hecho
+
+### Notificación de pedido nuevo por WhatsApp (2026-09-03)
+El admin puede avisarse a sí mismo por WhatsApp cuando entra un pedido nuevo, sin depender de
+WhatsApp Business API ni de un número de Twilio (ninguno de los dos está disponible todavía).
+
+**Cómo quedó:**
+- Botón "Avisar por WhatsApp" en cada tarjeta de `/pedidos`, que abre un link `wa.me/<numero>`
+  con el mensaje del pedido (cliente, contacto, método de pago, items) ya escrito.
+- **No es automático**: alguien tiene que tocar "Enviar" en WhatsApp. La alternativa automática
+  real (WhatsApp Business API) requiere cuenta verificada y tiene costo por mensaje; las
+  librerías no oficiales que automatizan WhatsApp Web violan los términos de uso y arriesgan el
+  baneo del número — ninguna de las dos vale la pena para este volumen de pedidos.
+- El número del admin está hardcodeado en el frontend (`WHATSAPP_ADMIN` en `Pedidos.jsx`). No es
+  un secreto — es el mismo número que un botón público de "chatear por WhatsApp" mostraría en
+  cualquier sitio — pero si cambia, hay que tocar código (no hay panel para editarlo).
+
+### Panel de stock editable por el admin (2026-09-03)
+Los productos (nombre, descripción, categoría, foto, precio) se cargan directo en la base y no
+cambian — pero el stock disponible sí, todos los días.
+
+**Cómo quedó:**
+- Nueva página `/stock`, protegida igual que `/pedidos`, con nombre/categoría/precio de solo
+  lectura y el stock (`stock_kg`) editable por producto.
+- Nuevo `PATCH /api/productos/{id}/stock`, endpoint dedicado (no reusa el `PUT` genérico) para
+  no arriesgar pisar otros campos con datos viejos del frontend.
+- De paso se protegieron `POST/PUT/DELETE /api/productos`, que estaban públicos sin querer desde
+  el día uno — no hay ningún flujo del catálogo que los necesite sin login.
+
+### Nav protegido por sesión (2026-09-03)
+El link "Pedidos" del header aparecía siempre, aunque `/pedidos` ya rechazara la carga sin
+sesión con un redirect a `/login`. Ahora directamente no se muestra sin sesión activa.
+
+**Cómo quedó:**
+- Nuevo `GET /api/me` (protegido) para que el frontend le pregunte al backend si la cookie de
+  sesión sigue siendo válida — no se puede leer la cookie httpOnly desde JS.
+- `AuthProvider`/`useAuth()` centralizan ese estado; login, logout y una sesión vencida (401 en
+  cualquier fetch protegido) lo actualizan al toque, sin esperar un refresh de página.
+- El link que decía "Admin" ahora dice "Iniciar sesión".
 
 ### Estados de pedido editables por el admin (2026-09-03)
 Antes, `pedidos.estado` existía en el modelo pero nadie lo podía cambiar: todo pedido quedaba
