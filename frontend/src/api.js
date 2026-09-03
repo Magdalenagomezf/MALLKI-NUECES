@@ -68,6 +68,13 @@ export function deleteProducto(id) {
   return request(`/productos/${id}`, { method: 'DELETE' });
 }
 
+export function updateProductoStock(id, stockKg) {
+  return request(`/productos/${id}/stock`, {
+    method: 'PATCH',
+    body: JSON.stringify({ stock_kg: stockKg }),
+  });
+}
+
 // --- Pedidos ---
 
 export function getPedidos() {

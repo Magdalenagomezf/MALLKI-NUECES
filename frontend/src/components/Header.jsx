@@ -19,7 +19,12 @@ export function Header() {
   const links = [
     { to: '/', label: 'Catálogo' },
     { to: '/armar-pedido', label: 'Armar pedido' },
-    ...(isAuthenticated === true ? [{ to: '/pedidos', label: 'Pedidos' }] : []),
+    ...(isAuthenticated === true
+      ? [
+          { to: '/pedidos', label: 'Pedidos' },
+          { to: '/stock', label: 'Stock' },
+        ]
+      : []),
     { to: '/login', label: 'Iniciar sesión' },
   ];
 

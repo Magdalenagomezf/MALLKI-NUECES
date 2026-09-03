@@ -53,11 +53,17 @@ func main() {
 	mux.HandleFunc("POST /api/logout", authHandler.Logout)
 	mux.HandleFunc("GET /api/me", requireAuth(authHandler.Me))
 
+	// Los productos (nombre, descripción, categoría, foto, precio) son fijos y
+	// se cargan directamente en la base: el catálogo los lee sin login (GET
+	// público), pero crearlos/editarlos/borrarlos es una acción de admin.
 	mux.HandleFunc("GET /api/productos", productoHandler.List)
 	mux.HandleFunc("GET /api/productos/{id}", productoHandler.Get)
-	mux.HandleFunc("POST /api/productos", productoHandler.Create)
-	mux.HandleFunc("PUT /api/productos/{id}", productoHandler.Update)
-	mux.HandleFunc("DELETE /api/productos/{id}", productoHandler.Delete)
+	mux.HandleFunc("POST /api/productos", requireAuth(productoHandler.Create))
+	mux.HandleFunc("PUT /api/productos/{id}", requireAuth(productoHandler.Update))
+	mux.HandleFunc("DELETE /api/productos/{id}", requireAuth(productoHandler.Delete))
+	// PATCH /api/productos/{id}/stock es lo único que el admin puede editar de
+	// un producto desde el panel: el resto de los campos son fijos.
+	mux.HandleFunc("PATCH /api/productos/{id}/stock", requireAuth(productoHandler.UpdateStock))
 
 	// POST /api/pedidos (armar pedido) es público a propósito: lo usan los
 	// clientes desde /armar-pedido. GET /api/pedidos (listar) es solo para

@@ -96,6 +96,38 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	httpx.WriteJSON(w, http.StatusOK, updated)
 }
 
+func (h *Handler) UpdateStock(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "id invalido")
+		return
+	}
+
+	var input struct {
+		StockKg float64 `json:"stock_kg"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		httpx.WriteError(w, http.StatusBadRequest, "body invalido")
+		return
+	}
+
+	updated, err := h.service.UpdateStock(id, input.StockKg)
+	if err != nil {
+		if isValidationError(err) {
+			httpx.WriteError(w, http.StatusBadRequest, err.Error())
+			return
+		}
+		if errors.Is(err, ErrNotFound) {
+			httpx.WriteError(w, http.StatusNotFound, "producto no encontrado")
+			return
+		}
+		httpx.WriteError(w, http.StatusInternalServerError, "error actualizando stock del producto")
+		return
+	}
+
+	httpx.WriteJSON(w, http.StatusOK, updated)
+}
+
 func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {

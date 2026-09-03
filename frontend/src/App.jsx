@@ -4,6 +4,7 @@ import { Footer } from './components/Footer';
 import { Catalogo } from './components/Catalogo';
 import { ArmarPedido } from './components/ArmarPedido';
 import { Pedidos } from './components/Pedidos';
+import { Stock } from './components/Stock';
 import { Login } from './components/Login';
 import { AuthProvider } from './auth';
 
@@ -20,6 +21,7 @@ function App() {
               <Route path="/" element={<Catalogo />} />
               <Route path="/armar-pedido" element={<ArmarPedido />} />
               <Route path="/pedidos" element={<Pedidos />} />
+              <Route path="/stock" element={<Stock />} />
               <Route path="/login" element={<Login />} />
             </Routes>
           </main>
