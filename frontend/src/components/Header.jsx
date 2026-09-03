@@ -6,6 +6,7 @@ const LINKS = [
   { to: '/', label: 'Catálogo' },
   { to: '/armar-pedido', label: 'Armar pedido' },
   { to: '/pedidos', label: 'Pedidos' },
+  { to: '/login', label: 'Admin' },
 ];
 
 function navLinkClasses({ isActive }) {

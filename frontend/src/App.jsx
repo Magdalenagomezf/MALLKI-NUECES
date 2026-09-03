@@ -4,6 +4,7 @@ import { Footer } from './components/Footer';
 import { Catalogo } from './components/Catalogo';
 import { ArmarPedido } from './components/ArmarPedido';
 import { Pedidos } from './components/Pedidos';
+import { Login } from './components/Login';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
             <Route path="/" element={<Catalogo />} />
             <Route path="/armar-pedido" element={<ArmarPedido />} />
             <Route path="/pedidos" element={<Pedidos />} />
+            <Route path="/login" element={<Login />} />
           </Routes>
         </main>
         <Footer />

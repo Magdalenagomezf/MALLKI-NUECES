@@ -32,7 +32,9 @@ async function request(path, options = {}) {
 
   if (!response.ok) {
     const message = body?.error || `Error inesperado (${response.status})`;
-    throw new Error(message);
+    const error = new Error(message);
+    error.status = response.status;
+    throw error;
   }
 
   return body;
@@ -77,4 +79,17 @@ export function createPedido(pedido) {
     method: 'POST',
     body: JSON.stringify(pedido),
   });
+}
+
+// --- Auth ---
+
+export function login(usuario, contrasena) {
+  return request('/login', {
+    method: 'POST',
+    body: JSON.stringify({ usuario, contrasena }),
+  });
+}
+
+export function logout() {
+  return request('/logout', { method: 'POST' });
 }

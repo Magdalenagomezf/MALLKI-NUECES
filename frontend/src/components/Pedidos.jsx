@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { getPedidos } from '../api';
+import { useNavigate } from 'react-router-dom';
+import { getPedidos, logout } from '../api';
 import { PageBanner } from './PageBanner';
 import bannerFoto from '../assets/fotos/mitades-luz.jpg';
 
@@ -20,6 +21,7 @@ const ESTADO_BADGE_CLASSES = {
 const ESTADO_BADGE_DEFAULT = 'bg-secondary-100 text-secondary-700';
 
 export function Pedidos() {
+  const navigate = useNavigate();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -32,19 +34,41 @@ export function Pedidos() {
         const data = await getPedidos();
         setPedidos(data ?? []);
       } catch (err) {
+        if (err.status === 401) {
+          navigate('/login');
+          return;
+        }
         setError(err.message);
       } finally {
         setLoading(false);
       }
     }
     cargar();
-  }, []);
+  }, [navigate]);
+
+  async function handleLogout() {
+    try {
+      await logout();
+    } finally {
+      navigate('/login');
+    }
+  }
 
   return (
     <div className="flex flex-col">
       <PageBanner titulo="Pedidos" foto={bannerFoto} alt="Mitades de nuez en primer plano" />
 
       <div className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6">
+        <div className="mb-6 flex justify-end">
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="rounded-md border border-secondary-200 px-4 py-2 text-sm font-semibold text-secondary-700 transition-colors hover:bg-secondary-100"
+          >
+            Cerrar sesión
+          </button>
+        </div>
+
         {loading && <p className="text-secondary-500">Cargando pedidos...</p>}
         {error && (
           <p className="rounded-md bg-red-50 px-4 py-3 text-red-700">Error al cargar pedidos: {error}</p>
