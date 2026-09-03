@@ -36,6 +36,18 @@ func (r *Repository) InsertItem(tx *sql.Tx, pedidoID, productoID int, cantidadKg
 	return id, err
 }
 
+// UpdateEstado updates a pedido's estado and returns the row with its new
+// value. Returns sql.ErrNoRows if no pedido with that id exists.
+func (r *Repository) UpdateEstado(id int, estado string) (Pedido, error) {
+	var p Pedido
+	err := r.db.QueryRow(
+		`UPDATE pedidos SET estado = $1 WHERE id = $2
+		 RETURNING id, cliente_nombre, cliente_contacto, fecha_creacion, estado, metodo_pago`,
+		estado, id,
+	).Scan(&p.ID, &p.ClienteNombre, &p.ClienteContacto, &p.FechaCreacion, &p.Estado, &p.MetodoPago)
+	return p, err
+}
+
 // List reads all pedidos together with their items, including the producto
 // name for display. This is a read-model concern (presenting pedido data),
 // not a write concern, so it legitimately joins against productos here.

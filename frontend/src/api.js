@@ -81,6 +81,13 @@ export function createPedido(pedido) {
   });
 }
 
+export function updatePedidoEstado(id, estado) {
+  return request(`/pedidos/${id}/estado`, {
+    method: 'PATCH',
+    body: JSON.stringify({ estado }),
+  });
+}
+
 // --- Auth ---
 
 export function login(usuario, contrasena) {

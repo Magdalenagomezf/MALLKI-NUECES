@@ -25,8 +25,22 @@ func badRequest(message string) *Error {
 	return &Error{Status: http.StatusBadRequest, Message: message}
 }
 
+func notFound(message string) *Error {
+	return &Error{Status: http.StatusNotFound, Message: message}
+}
+
 func internalError(message string) *Error {
 	return &Error{Status: http.StatusInternalServerError, Message: message}
+}
+
+// estadosValidos son los únicos valores aceptados para pedidos.estado. Las
+// transiciones son libres a propósito: el admin puede corregir errores
+// poniendo cualquier estado en cualquier momento, sin máquina de estados.
+var estadosValidos = map[string]bool{
+	"pendiente":      true,
+	"confirmado":     true,
+	"en_preparacion": true,
+	"entregado":      true,
 }
 
 type Service struct {
@@ -41,6 +55,21 @@ func NewService(db *sql.DB, repo *Repository, productoRepo *producto.Repository)
 
 func (s *Service) List() ([]Pedido, error) {
 	return s.repo.List()
+}
+
+func (s *Service) UpdateEstado(id int, estado string) (Pedido, error) {
+	if !estadosValidos[estado] {
+		return Pedido{}, badRequest("estado debe ser uno de: pendiente, confirmado, en_preparacion, entregado")
+	}
+
+	pedido, err := s.repo.UpdateEstado(id, estado)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return Pedido{}, notFound("pedido no encontrado")
+		}
+		return Pedido{}, internalError("error actualizando estado del pedido")
+	}
+	return pedido, nil
 }
 
 func (s *Service) Create(input PedidoInput) (Pedido, error) {

@@ -13,14 +13,32 @@ _(vacío por ahora)_
 
 ## Backlog (a priorizar juntos, todavía sin orden ni decisiones)
 
-- **Estados de pedido**: pasar de solo `"pendiente"` a confirmado / en preparación / entregado.
-  El campo `pedidos.estado` ya existe en el modelo, pensado para esto.
 - **Precios por volumen**: descuento por cantidad, típico de venta mayorista.
 - **Notificación de pedido nuevo por WhatsApp**: más simple y más usado acá que email.
 - **Carga de fotos reales de producto**: panel simple para reemplazar las fotos genéricas
   actuales — depende del panel admin del login.
 
 ## Hecho
+
+### Estados de pedido editables por el admin (2026-09-03)
+Antes, `pedidos.estado` existía en el modelo pero nadie lo podía cambiar: todo pedido quedaba
+`"pendiente"` para siempre. Ahora el admin puede actualizarlo desde `/pedidos`.
+
+**Cómo quedó:**
+- Cuatro estados válidos: `pendiente`, `confirmado`, `en_preparacion`, `entregado` — mostrados en
+  la UI como "Pendiente", "Confirmado", "En preparación", "Entregado". Cualquier otro valor
+  (incluido vacío) se rechaza con `400` y mensaje en español.
+- **Transiciones libres, sin máquina de estados**: el admin puede poner cualquier estado válido en
+  cualquier momento, sin restricción de orden ni de secuencia. Decisión explícita para permitir
+  corregir errores de carga (por ejemplo, volver un pedido de "entregado" a "confirmado" si se
+  marcó mal) sin agregar la complejidad de una máquina de estados que todavía no hace falta.
+- Endpoint nuevo `PATCH /api/pedidos/{id}/estado`, protegido con el mismo middleware de sesión que
+  `GET /api/pedidos` (listar) — es una acción de gestión del admin, no algo que haga el cliente.
+  `404` si el pedido no existe.
+- El cliente en `/armar-pedido` no ve ni elige estado — sigue siendo un campo de gestión interna.
+- Frontend: selector (`<select>`) por pedido en `/pedidos`, junto al resto de la info de cada
+  tarjeta. Al cambiar, actualiza solo esa fila en el estado local de React (sin refetch completo
+  de la lista); si falla, muestra el error debajo del selector de ese pedido puntual.
 
 ### Método de pago por pedido (2026-09-03)
 El cliente ahora elige el método de pago al armar el pedido en `/armar-pedido`, sin pasarela de

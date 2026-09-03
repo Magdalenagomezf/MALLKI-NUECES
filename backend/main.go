@@ -63,6 +63,10 @@ func main() {
 	// el admin panel, protegido con la sesión de login.
 	mux.HandleFunc("POST /api/pedidos", pedidoHandler.Create)
 	mux.HandleFunc("GET /api/pedidos", requireAuth(pedidoHandler.List))
+	// PATCH /api/pedidos/{id}/estado también es solo para el admin panel:
+	// cambiar el estado de un pedido es una acción de gestión, no algo que
+	// haga el cliente.
+	mux.HandleFunc("PATCH /api/pedidos/{id}/estado", requireAuth(pedidoHandler.UpdateEstado))
 
 	handler := httpx.CORS(frontendOrigin)(mux)
 

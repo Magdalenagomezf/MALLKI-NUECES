@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPedidos, logout } from '../api';
+import { getPedidos, logout, updatePedidoEstado } from '../api';
 import { PageBanner } from './PageBanner';
 import bannerFoto from '../assets/fotos/mitades-luz.jpg';
 
@@ -15,8 +15,19 @@ function formatearFecha(fechaISO) {
   }
 }
 
+const ESTADOS = [
+  { value: 'pendiente', label: 'Pendiente' },
+  { value: 'confirmado', label: 'Confirmado' },
+  { value: 'en_preparacion', label: 'En preparación' },
+  { value: 'entregado', label: 'Entregado' },
+];
+const ESTADO_LABELS = Object.fromEntries(ESTADOS.map((e) => [e.value, e.label]));
+
 const ESTADO_BADGE_CLASSES = {
   pendiente: 'bg-yellow-100 text-yellow-800',
+  confirmado: 'bg-blue-100 text-blue-800',
+  en_preparacion: 'bg-orange-100 text-orange-800',
+  entregado: 'bg-green-100 text-green-800',
 };
 const ESTADO_BADGE_DEFAULT = 'bg-secondary-100 text-secondary-700';
 
@@ -25,6 +36,7 @@ export function Pedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [estadoErrors, setEstadoErrors] = useState({});
 
   useEffect(() => {
     async function cargar() {
@@ -51,6 +63,18 @@ export function Pedidos() {
       await logout();
     } finally {
       navigate('/login');
+    }
+  }
+
+  async function handleEstadoChange(pedidoId, nuevoEstado) {
+    setEstadoErrors((prev) => ({ ...prev, [pedidoId]: null }));
+    try {
+      const actualizado = await updatePedidoEstado(pedidoId, nuevoEstado);
+      setPedidos((prev) =>
+        prev.map((p) => (p.id === pedidoId ? { ...p, estado: actualizado.estado } : p))
+      );
+    } catch (err) {
+      setEstadoErrors((prev) => ({ ...prev, [pedidoId]: err.message }));
     }
   }
 
@@ -91,7 +115,7 @@ export function Pedidos() {
                       ESTADO_BADGE_CLASSES[pedido.estado] ?? ESTADO_BADGE_DEFAULT
                     }`}
                   >
-                    {pedido.estado}
+                    {ESTADO_LABELS[pedido.estado] ?? pedido.estado}
                   </span>
                 </header>
                 <p className="mt-1 text-secondary-700">
@@ -100,6 +124,26 @@ export function Pedidos() {
                 <p className="mt-0.5 text-sm text-secondary-500">
                   {formatearFecha(pedido.fecha_creacion)} · Pago: {pedido.metodo_pago}
                 </p>
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <label htmlFor={`estado-${pedido.id}`} className="text-sm font-semibold text-secondary-700">
+                    Estado:
+                  </label>
+                  <select
+                    id={`estado-${pedido.id}`}
+                    value={pedido.estado}
+                    onChange={(e) => handleEstadoChange(pedido.id, e.target.value)}
+                    className="rounded-md border border-secondary-200 px-2 py-1 text-sm text-secondary-700 focus:border-secondary-400 focus:outline-none"
+                  >
+                    {ESTADOS.map((estadoOpt) => (
+                      <option key={estadoOpt.value} value={estadoOpt.value}>
+                        {estadoOpt.label}
+                      </option>
+                    ))}
+                  </select>
+                  {estadoErrors[pedido.id] && (
+                    <span className="text-sm text-red-700">{estadoErrors[pedido.id]}</span>
+                  )}
+                </div>
                 <div className="mt-3 overflow-x-auto">
                   <table className="w-full border-collapse text-sm">
                     <thead>
