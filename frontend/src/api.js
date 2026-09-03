@@ -100,3 +100,7 @@ export function login(usuario, contrasena) {
 export function logout() {
   return request('/logout', { method: 'POST' });
 }
+
+export function getMe() {
+  return request('/me');
+}

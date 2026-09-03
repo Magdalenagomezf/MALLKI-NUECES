@@ -51,6 +51,7 @@ func main() {
 
 	mux.HandleFunc("POST /api/login", authHandler.Login)
 	mux.HandleFunc("POST /api/logout", authHandler.Logout)
+	mux.HandleFunc("GET /api/me", requireAuth(authHandler.Me))
 
 	mux.HandleFunc("GET /api/productos", productoHandler.List)
 	mux.HandleFunc("GET /api/productos/{id}", productoHandler.Get)

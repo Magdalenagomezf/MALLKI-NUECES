@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPedidos, logout, updatePedidoEstado } from '../api';
+import { useAuth } from '../auth';
 import { PageBanner } from './PageBanner';
 import bannerFoto from '../assets/fotos/mitades-luz.jpg';
 
@@ -33,6 +34,7 @@ const ESTADO_BADGE_DEFAULT = 'bg-secondary-100 text-secondary-700';
 
 export function Pedidos() {
   const navigate = useNavigate();
+  const { setAuthenticated } = useAuth();
   const [pedidos, setPedidos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -47,6 +49,7 @@ export function Pedidos() {
         setPedidos(data ?? []);
       } catch (err) {
         if (err.status === 401) {
+          setAuthenticated(false);
           navigate('/login');
           return;
         }
@@ -56,12 +59,13 @@ export function Pedidos() {
       }
     }
     cargar();
-  }, [navigate]);
+  }, [navigate, setAuthenticated]);
 
   async function handleLogout() {
     try {
       await logout();
     } finally {
+      setAuthenticated(false);
       navigate('/login');
     }
   }
